@@ -6,11 +6,7 @@ var docker = new Docker({socketPath: '/var/run/docker.sock'});
 var nodes = [];
 refreshNodes();
 
-app.get('/', function(req, res) {
-  res.sendFile('index.html', { root: __dirname });
-});
-
-
+app.use(express.static('public'));
 
 
 app.get('/containers', function(req, res) {
