@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Container Visualizer</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+  <meta name=viewport content="width=device-width,initial-scale=1" />
+  <style type="text/css">
+    body { background-color: #003E52; font-family: 'Open Sans', sans-serif; color: #eee; }
+    .service { display: flex; width: 500px; height: 400px; margin: 0 auto; background-color: #196B96; padding: 15px; }
+    .node { display: flex; flex-direction: column-reverse; flex: 1; text-align: center; }
+    .container { width: 100px; height: 100px; border: 2px solid #ccc; margin: 5px auto; position: relative; }
+    .version { position: absolute; top: 0px; right: 0px; padding: 5px; }
+    .red { background-color: #FFCDD2; color: black; }
+    .yellow { background-color: #FFF9C4; color: black; }
+    .blue { background-color: #B3E5FC; color: black; }
+    .white { background-color: #ECEFF1; color: black; }
+    .green { background-color: #DCEDC8; color: black; }
+  </style>
+</head>
+<body>
+
+<div class="service"></div>
+
+<script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript">
+
+var versionColors = ['red', 'yellow', 'blue', 'white', 'green'];
+var versionColorMap = {};
+
+function fetch() {
+  $.get('/containers', updateDisplay);
+}
+
+function updateDisplay(data) {
+  nodes = data.nodes.sort(function(a, b) { return a.name > b.name; });
+
+  var $service = $(".service");
+  $service.html('');
+  nodes.forEach(function(node) {
+    var $node = $("<div class='node'><div class='title'>" + node.name + "</div><div class='containers'></div></div>");
+    node.containers.forEach(function(container) {
+      var version = container.substring(container.indexOf(":") + 1);
+      if (versionColorMap[version] === undefined) {  
+        versionColorMap[version] = versionColors[ Object.keys(versionColorMap).length ];
+      }
+      $node.append("<div class='container'><span class='version " + versionColorMap[version] + "'>" + version + "</span></div>");
+    });
+    $service.append($node); 
+  });
+}
+
+setInterval(fetch, 2000);
+fetch();
+</script>
+</body>
+</html>
